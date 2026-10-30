@@ -1,107 +1,68 @@
 <!doctype html>
-<html lang="vi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#fce7f3">
+<html lang="vi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#fce7f3">
 <title>QR-Scan Pinkpanter</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <style>
-:root{--pink:#ec4899;--deep:#be185d;--pale:#fdf2f8;--line:#f9a8d4}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#fff1f7,#fce7f3);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#831843;min-height:100vh;padding:20px 14px 36px}
+:root{--pink:#ec4899;--deep:#be185d;--pale:#fdf2f8;--line:#f9a8d4}*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(145deg,#fff1f7,#fce7f3);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#831843;min-height:100vh;padding:20px 14px 36px}
 main{max-width:520px;margin:auto;background:#fff;border:1px solid #fbcfe8;border-radius:24px;padding:22px;box-shadow:0 12px 35px #be185d18}
-h1{text-align:center;font-size:25px;margin:4px 0 8px;color:#be185d} .sub{text-align:center;color:#9d174d;font-size:14px;margin:0 0 20px}
-.tabs{display:flex;gap:8px;margin:18px 0 14px}.tab{flex:1;background:#fce7f3;color:#9d174d;border:1px solid #f9a8d4}.tab.active{background:var(--pink);color:#fff;border-color:var(--pink)}.pane{display:none}.pane.active{display:block}.scanner{border:2px dashed var(--line);background:var(--pale);border-radius:18px;padding:12px;text-align:center}#reader{width:100%;overflow:hidden;border-radius:12px;background:#fff}#reader video{border-radius:12px}.scanresult{font-size:13px;overflow-wrap:anywhere;margin-top:10px;color:#9d174d}
+h1{text-align:center;font-size:25px;margin:4px 0 8px;color:#be185d}.sub{text-align:center;color:#9d174d;font-size:14px;margin:0 0 18px}
+.tabs{display:flex;gap:8px;margin:18px 0 14px}.tab{flex:1;background:#fce7f3;color:#9d174d;border:1px solid #f9a8d4}.tab.active{background:var(--pink);color:white;border-color:var(--pink)}
 button,.filelabel{border:0;border-radius:13px;padding:12px 16px;font-weight:700;font-size:15px;background:var(--pink);color:white;cursor:pointer;display:inline-block}
 button.secondary{background:#fce7f3;color:#9d174d;border:1px solid #f9a8d4}
+.pane{display:none}.pane.active{display:block}.scanner,.drop{border:2px dashed var(--line);background:var(--pale);border-radius:18px;padding:14px;text-align:center}
+#reader{width:100%;overflow:hidden;border-radius:12px;background:white}#reader video{width:100%;border-radius:12px}.scanresult{font-size:13px;overflow-wrap:anywhere;margin-top:10px;color:#9d174d}
 input[type=file]{display:none}.preview{margin-top:16px;display:none}.imgwrap{max-height:55vh;overflow:hidden;background:#fff0f6;border-radius:14px}.imgwrap img{display:block;max-width:100%}
 .controls{display:grid;gap:13px;margin-top:16px}.control{background:#fff7fb;border:1px solid #fbcfe8;padding:12px;border-radius:13px}
 label{font-weight:650;font-size:14px;display:block;margin-bottom:8px}input[type=range]{width:100%;accent-color:var(--pink)}
 .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.actions button{flex:1;min-width:105px}
-.status{text-align:center;font-size:14px;min-height:22px;margin:14px 0 0;color:#9d174d}.hint{font-size:12px;color:#a16283;text-align:center;margin-top:12px}
-#busy{display:none;color:#be185d;font-weight:700;text-align:center;margin-top:12px}
-</style>
-</head>
-<body>
-<main>
-<h1>✨ Scan hoặc tải ảnh</h1>
-<p class="sub">QR-Scan Pinkpanter · Chụp ảnh hoặc chọn ảnh từ thư viện</p>
-<div class="drop">
-<p style="margin:0 0 14px">Chọn ảnh cần gửi lên máy tính</p>
-<label class="filelabel" for="file">📷 Chụp ảnh / Chọn ảnh</label>
-<input id="file" type="file" accept="image/*" capture="environment">
-</div>
-<section class="preview" id="preview">
-<div class="imgwrap"><img id="image" alt="Ảnh xem trước"></div>
-<div class="controls">
-<div class="control"><label for="bright">Độ sáng: <span id="brightVal">100%</span></label><input id="bright" type="range" min="50" max="180" value="100"></div>
-</div>
-<div class="actions">
-<button class="secondary" id="left" type="button">↶ Xoay trái</button>
-<button class="secondary" id="right" type="button">↷ Xoay phải</button>
-<button class="secondary" id="reset" type="button">Đặt lại</button>
-</div>
-<div class="actions"><button id="send" type="button">Gửi ảnh</button></div>
-</section>
-<div id="busy">Đang xử lý và gửi ảnh...</div>
-<p class="status" id="status" role="status"></p>
-<p class="hint">Giữ trang này mở cho đến khi gửi ảnh hoàn tất.</p>
+.status{text-align:center;font-size:14px;min-height:22px;margin:14px 0 0;color:#9d174d}.hint{font-size:12px;color:#a16283;text-align:center;margin-top:12px}#busy{display:none;color:#be185d;font-weight:700;text-align:center;margin-top:12px}
+</style></head><body><main>
+<h1>✨ Scan hoặc tải ảnh</h1><p class="sub">QR-Scan Pinkpanter · Chụp ảnh hoặc chọn ảnh từ thư viện</p>
+<div class="tabs"><button class="tab active" id="scanTab" type="button">▦ Quét mã QR</button><button class="tab" id="imageTab" type="button">▧ Thư viện ảnh</button></div>
+<section class="pane active" id="scanPane"><div class="scanner"><div id="reader"></div><p id="scanState" style="font-size:13px;margin:10px 0 0">Đang khởi động camera…</p><div id="scanResult" class="scanresult"></div><button class="secondary" id="scanAgain" type="button" style="display:none;margin-top:10px">Quét mã khác</button></div></section>
+<section class="pane" id="imagePane"><div class="drop"><p style="margin:0 0 14px">Chọn ảnh cần gửi lên máy tính</p><label class="filelabel" for="file">📷 Chụp ảnh / Chọn ảnh</label><input id="file" type="file" accept="image/*" capture="environment"></div></section>
+<section class="preview" id="preview"><div class="imgwrap"><img id="image" alt="Ảnh xem trước"></div>
+<div class="controls"><div class="control"><label for="bright">Độ sáng: <span id="brightVal">100%</span></label><input id="bright" type="range" min="50" max="180" value="100"></div></div>
+<div class="actions"><button class="secondary" id="left" type="button">↶ Xoay trái</button><button class="secondary" id="right" type="button">↷ Xoay phải</button><button class="secondary" id="reset" type="button">Đặt lại</button></div>
+<div class="actions"><button id="send" type="button">Gửi ảnh</button></div></section>
+<div id="busy">Đang xử lý và gửi ảnh...</div><p class="status" id="status" role="status"></p><p class="hint">Giữ trang này mở cho đến khi gửi ảnh hoàn tất.</p>
 </main>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>\n<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-(() => {
-const FIREBASE_URL = "https://qr-scan-pinkpanter-default-rtdb.asia-southeast1.firebasedatabase.app";
-const params = new URLSearchParams(location.search);
-const session = params.get("session");
-const fileInput=document.getElementById("file"), image=document.getElementById("image");
-const preview=document.getElementById("preview"),status=document.getElementById("status"),busy=document.getElementById("busy");
+(()=> {
+const DB="https://qr-scan-pinkpanter-default-rtdb.asia-southeast1.firebasedatabase.app";
+const params=new URLSearchParams(location.search),session=params.get("session");
+const $=id=>document.getElementById(id),fileInput=$("file"),image=$("image"),preview=$("preview"),status=$("status"),busy=$("busy");
 let cropper=null,brightness=100,qrScanner=null,scannerRunning=false;
 function say(t){status.textContent=t}
-if(!session){say("Thiếu mã phiên. Vui lòng mở trang bằng mã QR từ máy tính.");fileInput.disabled=true}
-const scanTab=document.getElementById("scanTab"),imageTab=document.getElementById("imageTab"),scanPane=document.getElementById("scanPane"),imagePane=document.getElementById("imagePane");
-function showPane(which){const isScan=which==="scan";scanTab.classList.toggle("active",isScan);imageTab.classList.toggle("active",!isScan);scanPane.classList.toggle("active",isScan);imagePane.classList.toggle("active",!isScan);if(isScan&&!scannerRunning)startScanner();if(!isScan)stopScanner();}
-scanTab.onclick=()=>showPane("scan");imageTab.onclick=()=>showPane("image");
+if(!session){fileInput.disabled=true;say("Hãy quét mã QR do máy tính tạo để bắt đầu phiên gửi ảnh.");}
+function setTab(which){const scan=which==="scan";$("scanTab").classList.toggle("active",scan);$("imageTab").classList.toggle("active",!scan);$("scanPane").classList.toggle("active",scan);$("imagePane").classList.toggle("active",!scan);if(scan)startScanner();else stopScanner();}
+$("scanTab").onclick=()=>setTab("scan");$("imageTab").onclick=()=>{if(!session){say("Cần quét mã QR từ máy tính trước khi chọn ảnh.");setTab("scan");return;}setTab("image");};
 async function stopScanner(){if(qrScanner&&scannerRunning){try{await qrScanner.stop();}catch(e){}scannerRunning=false;}}
 async function startScanner(){
- const state=document.getElementById("scanState");state.textContent="Đang mở camera…";
- if(!window.Html5Qrcode){state.textContent="Không tải được công cụ quét QR. Kiểm tra kết nối Internet.";return}
- try{
-  if(!qrScanner)qrScanner=new Html5Qrcode("reader");
-  await qrScanner.start({facingMode:"environment"},{fps:10,qrbox:{width:230,height:230}},async decoded=>{
-   state.textContent="Đã quét được mã QR!";
-   document.getElementById("scanResult").textContent=decoded;
-   document.getElementById("scanAgain").style.display="inline-block";
-   await stopScanner();
-  },()=>{});
-  scannerRunning=true;state.textContent="Đưa mã QR vào khung camera để quét.";
- }catch(e){state.textContent="Không mở được camera. Hãy cấp quyền camera cho trình duyệt và thử lại.";}
-}
-document.getElementById("scanAgain").onclick=()=>{document.getElementById("scanResult").textContent="";document.getElementById("scanAgain").style.display="none";startScanner();};
-if(session)startScanner();else{document.getElementById("scanState").textContent="Mở trang từ QR trên máy tính để gửi ảnh. Em vẫn có thể dùng chức năng quét mã QR.";}
-fileInput.addEventListener("change",()=>{
- const f=fileInput.files&&fileInput.files[0]; if(!f)return;
- if(!f.type.startsWith("image/")){say("Vui lòng chọn tệp hình ảnh.");return}
- if(cropper){cropper.destroy();cropper=null}
- const url=URL.createObjectURL(f);image.onload=()=>{preview.style.display="block";if(cropper)cropper.destroy();cropper=new Cropper(image,{viewMode:1,autoCropArea:1,background:false, responsive:true})};image.src=url;say("Kéo khung để cắt ảnh nếu cần.");
-});
-document.getElementById("bright").addEventListener("input",e=>{brightness=+e.target.value;document.getElementById("brightVal").textContent=brightness+"%";image.style.filter="brightness("+brightness+"%)"});
-document.getElementById("left").onclick=()=>cropper&&cropper.rotate(-90);
-document.getElementById("right").onclick=()=>cropper&&cropper.rotate(90);
-document.getElementById("reset").onclick=()=>{if(cropper)cropper.reset();brightness=100;document.getElementById("bright").value=100;document.getElementById("brightVal").textContent="100%";image.style.filter="none"};
-document.getElementById("send").onclick=async()=>{
- if(!cropper){say("Em hãy chọn ảnh trước.");return}
- busy.style.display="block";say("");
- try{
-  const canvas=cropper.getCroppedCanvas({maxWidth:2400,maxHeight:2400,imageSmoothingEnabled:true,imageSmoothingQuality:"high"});
-  const out=document.createElement("canvas");out.width=canvas.width;out.height=canvas.height;
-  const ctx=out.getContext("2d");ctx.filter="brightness("+brightness+"%) contrast(112%)";ctx.drawImage(canvas,0,0);
-  const data=out.toDataURL("image/jpeg",0.72);
-  const response=await fetch(FIREBASE_URL+"/sessions/"+encodeURIComponent(session)+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:data,updatedAt:Date.now(),status:"uploaded"})});
-  if(!response.ok)throw new Error("Firebase trả về lỗi "+response.status);
-  say("✓ Gửi ảnh thành công! Có thể quay lại máy tính.");alert("🐾 Báo hồng đã tải ảnh thành công!");
- }catch(err){say("Không gửi được ảnh: "+err.message)}
- finally{busy.style.display="none"}
-};
+ const state=$("scanState");if(scannerRunning)return;state.textContent="Đang mở camera…";
+ if(!window.Html5Qrcode){state.textContent="Không tải được bộ quét QR. Kiểm tra kết nối Internet.";return;}
+ try{if(!qrScanner)qrScanner=new Html5Qrcode("reader");
+ await qrScanner.start({facingMode:"environment"},{fps:10,qrbox:{width:230,height:230}},async decoded=>{
+  state.textContent="Đã quét mã QR."; $("scanResult").textContent=decoded;
+  let u;try{u=new URL(decoded);}catch(e){u=null;}
+  if(u&&u.hostname==="blackbear2406.github.io"&&u.pathname.startsWith("/QR-Scan-pink/")&&u.searchParams.get("session")){state.textContent="Đã nhận mã phiên. Đang mở trang gửi ảnh…";await stopScanner();location.href=u.href;return;}
+  $("scanAgain").style.display="inline-block";await stopScanner();
+ },()=>{});scannerRunning=true;state.textContent="Đưa mã QR trên máy tính vào khung camera để quét.";
+ }catch(e){state.textContent="Không mở được camera. Hãy cấp quyền camera cho Safari/Chrome rồi tải lại trang.";}}
+$("scanAgain").onclick=()=>{$("scanResult").textContent="";$("scanAgain").style.display="none";startScanner();};
+if(location.protocol==="https:"&&navigator.mediaDevices)startScanner();else $("scanState").textContent="Camera cần được mở trên trang HTTPS.";
+fileInput.addEventListener("change",()=>{const f=fileInput.files&&fileInput.files[0];if(!f)return;if(!f.type.startsWith("image/")){say("Vui lòng chọn tệp hình ảnh.");return;}if(cropper){cropper.destroy();cropper=null;}const url=URL.createObjectURL(f);image.onload=()=>{preview.style.display="block";if(cropper)cropper.destroy();cropper=new Cropper(image,{viewMode:1,autoCropArea:1,background:false,responsive:true});};image.src=url;say("Kéo khung để cắt ảnh nếu cần.");});
+$("bright").addEventListener("input",e=>{brightness=+e.target.value;$("brightVal").textContent=brightness+"%";image.style.filter="brightness("+brightness+"%)";});
+$("left").onclick=()=>cropper&&cropper.rotate(-90);$("right").onclick=()=>cropper&&cropper.rotate(90);
+$("reset").onclick=()=>{if(cropper)cropper.reset();brightness=100;$("bright").value=100;$("brightVal").textContent="100%";image.style.filter="none";};
+$("send").onclick=async()=>{if(!session){say("Chưa có mã phiên. Quét mã QR từ máy tính trước.");return;}if(!cropper){say("Em hãy chọn ảnh trước.");return;}busy.style.display="block";say("");
+ try{const canvas=cropper.getCroppedCanvas({maxWidth:2400,maxHeight:2400,imageSmoothingEnabled:true,imageSmoothingQuality:"high"});const out=document.createElement("canvas");out.width=canvas.width;out.height=canvas.height;const ctx=out.getContext("2d");ctx.filter="brightness("+brightness+"%) contrast(112%)";ctx.drawImage(canvas,0,0);const data=out.toDataURL("image/jpeg",0.72);
+ const response=await fetch(DB+"/sessions/"+encodeURIComponent(session)+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:data,updatedAt:Date.now(),status:"uploaded"})});if(!response.ok)throw new Error("Firebase trả về lỗi "+response.status);
+ say("✓ Gửi ảnh thành công! Có thể quay lại máy tính.");alert("🐾 Báo hồng đã tải ảnh thành công!");
+ }catch(err){say("Không gửi được ảnh: "+err.message);}finally{busy.style.display="none";}};
 })();
-</script>
-</body></html>
+</script></body></html>
