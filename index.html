@@ -40,9 +40,9 @@ label{font-weight:650;font-size:14px;display:block;margin-bottom:8px}
 const DB="https://qr-scan-pinkpanter-default-rtdb.asia-southeast1.firebasedatabase.app";
 const params=new URLSearchParams(location.search),session=params.get("session");
 const $=id=>document.getElementById(id),fileInput=$("file"),image=$("image"),preview=$("preview"),status=$("status"),busy=$("busy");
-let cropper=null,qrScanner=null,scannerRunning=false;
+let cropper=null,qrScanner=null,scannerRunning=false,sessionExpired=false;
 function say(t){status.textContent=t}
-if(session){$("tabs").style.display="none";$("scanPane").classList.remove("active");$("imagePane").classList.add("active");say("Đã kết nối với máy tính. Em có thể chụp ảnh hoặc chọn ảnh để gửi.");}else{fileInput.disabled=true;say("Hãy quét mã QR do máy tính tạo để bắt đầu phiên gửi ảnh.");}
+if(session){const createdAt=Number(session.split("_")[1]);if(!createdAt||Date.now()-createdAt>10*60*1000){sessionExpired=true;fileInput.disabled=true;say("Mã QR đã hết hạn. Vui lòng quét mã mới từ máy tính.");} $("tabs").style.display="none";$("scanPane").classList.remove("active");$("imagePane").classList.add("active");if(!sessionExpired)say("Đã kết nối với máy tính. Em có thể chụp ảnh hoặc chọn ảnh để gửi.");}else{fileInput.disabled=true;say("Hãy quét mã QR do máy tính tạo để bắt đầu phiên gửi ảnh.");}
 function setTab(which){const scan=which==="scan";$("scanTab").classList.toggle("active",scan);$("imageTab").classList.toggle("active",!scan);$("scanPane").classList.toggle("active",scan);$("imagePane").classList.toggle("active",!scan);if(scan)startScanner();else stopScanner();}
 $("scanTab").onclick=()=>setTab("scan");$("imageTab").onclick=()=>{if(!session){say("Cần quét mã QR từ máy tính trước khi chọn ảnh.");setTab("scan");return;}setTab("image");};
 async function stopScanner(){if(qrScanner&&scannerRunning){try{await qrScanner.stop();}catch(e){}scannerRunning=false;}}
@@ -61,10 +61,10 @@ $("scanAgain").onclick=()=>{$("scanResult").textContent="";$("scanAgain").style.
 if(!session){if(location.protocol==="https:"&&navigator.mediaDevices)startScanner();else $("scanState").textContent="Camera cần được mở trên trang HTTPS.";}
 fileInput.addEventListener("change",()=>{const f=fileInput.files&&fileInput.files[0];if(!f)return;if(!f.type.startsWith("image/")){say("Vui lòng chọn tệp hình ảnh.");return;}$("imagePane").querySelector(".drop").style.display="none";if(cropper){cropper.destroy();cropper=null;}const url=URL.createObjectURL(f);image.onload=()=>{preview.style.display="block";if(cropper)cropper.destroy();cropper=new Cropper(image,{viewMode:1,autoCropArea:1,background:false,responsive:true});};image.src=url;say("Kéo khung để cắt ảnh nếu cần.");});
 $("left").onclick=()=>cropper&&cropper.rotate(-90);$("right").onclick=()=>cropper&&cropper.rotate(90);
-$("send").onclick=async()=>{if(!session){say("Chưa có mã phiên. Quét mã QR từ máy tính trước.");return;}if(!cropper){say("Em hãy chọn ảnh trước.");return;}busy.style.display="block";say("");
+$("send").onclick=async()=>{if(!session||sessionExpired){say("Mã QR không hợp lệ hoặc đã hết hạn. Hãy quét mã mới từ máy tính.");return;}if(!cropper){say("Em hãy chọn ảnh trước.");return;}busy.style.display="block";$("send").disabled=true;say("");
  try{const canvas=cropper.getCroppedCanvas({maxWidth:1920,maxHeight:1920,imageSmoothingEnabled:true,imageSmoothingQuality:"high"});const data=canvas.toDataURL("image/jpeg",0.72);
  const response=await fetch(DB+"/sessions/"+encodeURIComponent(session)+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:data,updatedAt:Date.now(),status:"uploaded"})});if(!response.ok)throw new Error("Firebase trả về lỗi "+response.status);
  say("✓ Gửi ảnh thành công! Có thể quay lại máy tính.");alert("🐾 Báo hồng đã tải ảnh thành công!");
- }catch(err){say("Không gửi được ảnh: "+err.message);}finally{busy.style.display="none";}};
+ }catch(err){say("Không gửi được ảnh: "+err.message);}finally{busy.style.display="none";$("send").disabled=false;}};
 })();
 </script></body></html>
