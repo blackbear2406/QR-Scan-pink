@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#fce7f3">
+<title>QR-Scan Pinkpanter</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<style>
+:root{--pink:#ec4899;--deep:#be185d;--pale:#fdf2f8;--line:#f9a8d4}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#fff1f7,#fce7f3);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#831843;min-height:100vh;padding:20px 14px 36px}
+main{max-width:520px;margin:auto;background:#fff;border:1px solid #fbcfe8;border-radius:24px;padding:22px;box-shadow:0 12px 35px #be185d18}
+h1{text-align:center;font-size:25px;margin:4px 0 8px;color:#be185d} .sub{text-align:center;color:#9d174d;font-size:14px;margin:0 0 20px}
+.drop{border:2px dashed var(--line);background:var(--pale);border-radius:18px;padding:22px 14px;text-align:center}
+button,.filelabel{border:0;border-radius:13px;padding:12px 16px;font-weight:700;font-size:15px;background:var(--pink);color:white;cursor:pointer;display:inline-block}
+button.secondary{background:#fce7f3;color:#9d174d;border:1px solid #f9a8d4}
+input[type=file]{display:none}.preview{margin-top:16px;display:none}.imgwrap{max-height:55vh;overflow:hidden;background:#fff0f6;border-radius:14px}.imgwrap img{display:block;max-width:100%}
+.controls{display:grid;gap:13px;margin-top:16px}.control{background:#fff7fb;border:1px solid #fbcfe8;padding:12px;border-radius:13px}
+label{font-weight:650;font-size:14px;display:block;margin-bottom:8px}input[type=range]{width:100%;accent-color:var(--pink)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.actions button{flex:1;min-width:105px}
+.status{text-align:center;font-size:14px;min-height:22px;margin:14px 0 0;color:#9d174d}.hint{font-size:12px;color:#a16283;text-align:center;margin-top:12px}
+#busy{display:none;color:#be185d;font-weight:700;text-align:center;margin-top:12px}
+</style>
+</head>
+<body>
+<main>
+<h1>✨ Scan hoặc tải ảnh</h1>
+<p class="sub">QR-Scan Pinkpanter · Chụp ảnh hoặc chọn ảnh từ thư viện</p>
+<div class="drop">
+<p style="margin:0 0 14px">Chọn ảnh cần gửi lên máy tính</p>
+<label class="filelabel" for="file">📷 Chụp ảnh / Chọn ảnh</label>
+<input id="file" type="file" accept="image/*" capture="environment">
+</div>
+<section class="preview" id="preview">
+<div class="imgwrap"><img id="image" alt="Ảnh xem trước"></div>
+<div class="controls">
+<div class="control"><label for="bright">Độ sáng: <span id="brightVal">100%</span></label><input id="bright" type="range" min="50" max="180" value="100"></div>
+</div>
+<div class="actions">
+<button class="secondary" id="left" type="button">↶ Xoay trái</button>
+<button class="secondary" id="right" type="button">↷ Xoay phải</button>
+<button class="secondary" id="reset" type="button">Đặt lại</button>
+</div>
+<div class="actions"><button id="send" type="button">Gửi ảnh</button></div>
+</section>
+<div id="busy">Đang xử lý và gửi ảnh...</div>
+<p class="status" id="status" role="status"></p>
+<p class="hint">Giữ trang này mở cho đến khi gửi ảnh hoàn tất.</p>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script>
+(() => {
+const FIREBASE_URL = "https://qr-scan-pinkpanter-default-rtdb.asia-southeast1.firebasedatabase.app";
+const params = new URLSearchParams(location.search);
+const session = params.get("session");
+const fileInput=document.getElementById("file"), image=document.getElementById("image");
+const preview=document.getElementById("preview"),status=document.getElementById("status"),busy=document.getElementById("busy");
+let cropper=null,brightness=100;
+function say(t){status.textContent=t}
+if(!session){say("Thiếu mã phiên. Vui lòng quét QR được tạo từ máy tính.");fileInput.disabled=true;return}
+fileInput.addEventListener("change",()=>{
+ const f=fileInput.files&&fileInput.files[0]; if(!f)return;
+ if(!f.type.startsWith("image/")){say("Vui lòng chọn tệp hình ảnh.");return}
+ if(cropper){cropper.destroy();cropper=null}
+ const url=URL.createObjectURL(f);image.onload=()=>{preview.style.display="block";if(cropper)cropper.destroy();cropper=new Cropper(image,{viewMode:1,autoCropArea:1,background:false, responsive:true})};image.src=url;say("Kéo khung để cắt ảnh nếu cần.");
+});
+document.getElementById("bright").addEventListener("input",e=>{brightness=+e.target.value;document.getElementById("brightVal").textContent=brightness+"%";image.style.filter="brightness("+brightness+"%)"});
+document.getElementById("left").onclick=()=>cropper&&cropper.rotate(-90);
+document.getElementById("right").onclick=()=>cropper&&cropper.rotate(90);
+document.getElementById("reset").onclick=()=>{if(cropper)cropper.reset();brightness=100;document.getElementById("bright").value=100;document.getElementById("brightVal").textContent="100%";image.style.filter="none"};
+document.getElementById("send").onclick=async()=>{
+ if(!cropper){say("Em hãy chọn ảnh trước.");return}
+ busy.style.display="block";say("");
+ try{
+  const canvas=cropper.getCroppedCanvas({maxWidth:2400,maxHeight:2400,imageSmoothingEnabled:true,imageSmoothingQuality:"high"});
+  const out=document.createElement("canvas");out.width=canvas.width;out.height=canvas.height;
+  const ctx=out.getContext("2d");ctx.filter="brightness("+brightness+"%) contrast(112%)";ctx.drawImage(canvas,0,0);
+  const data=out.toDataURL("image/jpeg",0.72);
+  const response=await fetch(FIREBASE_URL+"/sessions/"+encodeURIComponent(session)+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:data,updatedAt:Date.now(),status:"uploaded"})});
+  if(!response.ok)throw new Error("Firebase trả về lỗi "+response.status);
+  say("✓ Gửi ảnh thành công! Có thể quay lại máy tính.");
+ }catch(err){say("Không gửi được ảnh: "+err.message)}
+ finally{busy.style.display="none"}
+};
+})();
+</script>
+</body></html>
