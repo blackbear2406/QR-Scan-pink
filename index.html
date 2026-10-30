@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="vi"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta name="theme-color" content="#fce7f3">
-<title>QR-Scan Pinkpanter</title>
+<title>QR-Scan Pink Panther</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 <style>
 :root{--pink:#ec4899;--deep:#be185d;--pale:#fdf2f8;--line:#f9a8d4}*{box-sizing:border-box}
@@ -13,7 +13,7 @@ button,.filelabel{border:0;border-radius:13px;padding:12px 16px;font-weight:700;
 button.secondary{background:#fce7f3;color:#9d174d;border:1px solid #f9a8d4}
 .pane{display:none}.pane.active{display:block}.scanner,.drop{border:2px dashed var(--line);background:var(--pale);border-radius:18px;padding:14px;text-align:center}
 #reader{width:100%;overflow:hidden;border-radius:12px;background:white}#reader video{width:100%;border-radius:12px}.scanresult{font-size:13px;overflow-wrap:anywhere;margin-top:10px;color:#9d174d}
-/* Cropper selection theme: Pinkpanter */
+/* Cropper selection theme: Pink Panther */
 .cropper-view-box{outline:2px solid #ec4899!important;outline-color:#ec4899!important}
 .cropper-line,.cropper-point{background-color:#ec4899!important}
 .cropper-point{width:8px;height:8px;opacity:1}
@@ -24,7 +24,7 @@ label{font-weight:650;font-size:14px;display:block;margin-bottom:8px}
 .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.actions button{flex:1;min-width:105px}
 .status{text-align:center;font-size:14px;min-height:22px;margin:14px 0 0;color:#9d174d}.hint{font-size:12px;color:#a16283;text-align:center;margin-top:12px}#busy{display:none;color:#be185d;font-weight:700;text-align:center;margin-top:12px}
 </style></head><body><main>
-<h1>🐾 Chụp ảnh</h1><p class="sub">QR-Scan Pinkpanter · Chụp ảnh hoặc chọn ảnh từ thư viện</p>
+<h1>🐾 Chụp ảnh</h1><p class="sub">QR-Scan Pink Panther · Chụp ảnh hoặc chọn ảnh từ thư viện</p>
 <div class="tabs" id="tabs"><button class="tab active" id="scanTab" type="button">▦ Quét mã QR</button><button class="tab" id="imageTab" type="button">▧ Thư viện ảnh</button></div>
 <section class="pane active" id="scanPane"><div class="scanner"><div id="reader"></div><p id="scanState" style="font-size:13px;margin:10px 0 0">Đang khởi động camera…</p><div id="scanResult" class="scanresult"></div><button class="secondary" id="scanAgain" type="button" style="display:none;margin-top:10px">Quét mã khác</button></div></section>
 <section class="pane" id="imagePane"><div class="drop"><p style="margin:0 0 14px">Chọn ảnh cần gửi lên máy tính</p><label class="filelabel" for="file">📷 Chụp ảnh / Chọn ảnh</label><input id="file" type="file" accept="image/*" capture="environment"></div></section>
