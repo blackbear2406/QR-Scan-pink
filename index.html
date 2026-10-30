@@ -78,7 +78,7 @@ document.getElementById("send").onclick=async()=>{
   const data=out.toDataURL("image/jpeg",0.72);
   const response=await fetch(FIREBASE_URL+"/sessions/"+encodeURIComponent(session)+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:data,updatedAt:Date.now(),status:"uploaded"})});
   if(!response.ok)throw new Error("Firebase trả về lỗi "+response.status);
-  say("✓ Gửi ảnh thành công! Có thể quay lại máy tính.");
+  say("✓ Gửi ảnh thành công! Có thể quay lại máy tính.");alert("🐾 Báo hồng đã tải ảnh thành công!");
  }catch(err){say("Không gửi được ảnh: "+err.message)}
  finally{busy.style.display="none"}
 };
