@@ -56,7 +56,7 @@ if(!session){if(location.protocol==="https:"&&navigator.mediaDevices)startScanne
 fileInput.addEventListener("change",()=>{const f=fileInput.files&&fileInput.files[0];if(!f)return;if(!f.type.startsWith("image/")){say("Vui lòng chọn tệp hình ảnh.");return;}if(cropper){cropper.destroy();cropper=null;}const url=URL.createObjectURL(f);image.onload=()=>{preview.style.display="block";if(cropper)cropper.destroy();cropper=new Cropper(image,{viewMode:1,autoCropArea:1,background:false,responsive:true});};image.src=url;say("Kéo khung để cắt ảnh nếu cần.");});
 $("left").onclick=()=>cropper&&cropper.rotate(-90);$("right").onclick=()=>cropper&&cropper.rotate(90);
 $("send").onclick=async()=>{if(!session){say("Chưa có mã phiên. Quét mã QR từ máy tính trước.");return;}if(!cropper){say("Em hãy chọn ảnh trước.");return;}busy.style.display="block";say("");
- try{const canvas=cropper.getCroppedCanvas({maxWidth:1280,maxHeight:1280,imageSmoothingEnabled:true,imageSmoothingQuality:"medium"});const data=canvas.toDataURL("image/jpeg",0.55);
+ try{const canvas=cropper.getCroppedCanvas({maxWidth:1920,maxHeight:1920,imageSmoothingEnabled:true,imageSmoothingQuality:"high"});const data=canvas.toDataURL("image/jpeg",0.72);
  const response=await fetch(DB+"/sessions/"+encodeURIComponent(session)+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:data,updatedAt:Date.now(),status:"uploaded"})});if(!response.ok)throw new Error("Firebase trả về lỗi "+response.status);
  say("✓ Gửi ảnh thành công! Có thể quay lại máy tính.");alert("🐾 Báo hồng đã tải ảnh thành công!");
  }catch(err){say("Không gửi được ảnh: "+err.message);}finally{busy.style.display="none";}};
