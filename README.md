@@ -1,2 +1,2 @@
-# QR-Scan-pink
-QR-Scan Pinkpanter
+# QR-Panther-HIS
+QR-Scan HIS_panther
