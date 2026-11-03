@@ -1,0 +1,52 @@
+name: Firebase QR Session Cleanup
+
+on:
+  schedule:
+    # Every 15 minutes (UTC). Scheduled workflows run from the default branch.
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Preview eligible sessions without deleting anything"
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firebase-qr-session-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Firebase Admin SDK
+        run: npm install --no-save firebase-admin
+
+      - name: Validate required secrets
+        env:
+          FIREBASE_SERVICE_ACCOUNT_JSON: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT_JSON" ]; then
+            echo "::error::Add FIREBASE_SERVICE_ACCOUNT_JSON in repository Actions secrets before enabling cleanup."
+            exit 1
+          fi
+
+      - name: Clean expired QR sessions
+        env:
+          FIREBASE_DATABASE_URL: "https://qr-scan-pinkpanter-default-rtdb.asia-southeast1.firebasedatabase.app"
+          FIREBASE_SERVICE_ACCOUNT_JSON: \${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          CLEANUP_DRY_RUN: \${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+        run: node scripts/cleanup-sessions.js
