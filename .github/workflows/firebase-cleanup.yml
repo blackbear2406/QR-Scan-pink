@@ -35,6 +35,9 @@ jobs:
       - name: Install Firebase Admin SDK
         run: npm install --no-save firebase-admin
 
+      - name: Check cleanup script syntax
+        run: node --check scripts/cleanup-sessions.js
+
       - name: Validate required secrets
         env:
           FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
